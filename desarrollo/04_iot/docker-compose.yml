@@ -1,0 +1,61 @@
+# =====================================================================
+#  Medidor PPG - servidor IoT: Mosquitto (MQTT) + Node-RED (Dashboard 2.0,
+#  motor de alertas, correo, WhatsApp, registro CSV)
+#
+#  1) ./scripts/generar_passwd.sh        (crea .env y las claves MQTT)
+#  2) docker compose up -d --build
+#  3) Dashboard: http://localhost:1880/dashboard    Editor: http://localhost:1880
+# =====================================================================
+name: pulso-iot
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: pulso-mosquitto
+    restart: unless-stopped
+    # Corre con el usuario del host: así passwd, acl y data/ son legibles sin chown
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    ports:
+      # 0.0.0.0 => accesible desde la LAN (el ESP32 se conecta aquí)
+      - "${MQTT_BIND:-0.0.0.0}:1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+      - ./mosquitto/data:/mosquitto/data
+    environment:
+      HC_USER: ${MQTT_NODERED_USER:-nodered}
+      HC_PASS: ${MQTT_NODERED_PASS:-}
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h 127.0.0.1 -u \"$$HC_USER\" -P \"$$HC_PASS\" -t '$$SYS/broker/uptime' -C 1 -W 5 >/dev/null"]
+      interval: 15s
+      timeout: 8s
+      retries: 5
+      start_period: 5s
+
+  nodered:
+    build:
+      context: ./nodered
+    image: pulso-nodered:1.0
+    container_name: pulso-nodered
+    restart: unless-stopped
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+    ports:
+      # Por defecto SOLO este PC (127.0.0.1). Para abrirlo a la LAN: NODERED_BIND=0.0.0.0 en .env
+      - "${NODERED_BIND:-127.0.0.1}:1880:1880"
+    env_file:
+      - .env
+    environment:
+      TZ: ${TZ:-America/Bogota}
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+    volumes:
+      # settings.js, flows.json, package.json, contexto y registros CSV (/data/registros)
+      - ./nodered/data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:1880/flows',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 20s

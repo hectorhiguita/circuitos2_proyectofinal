@@ -1,0 +1,75 @@
+* Acondicionador PPG - LM324 a 5 V, una sola fuente, centrado en VREF
+* Etapas: sensor -> HPF -> buffer -> preamp x31 -> Sallen-Key 4.9 Hz -> HPF -> final x(1+Rf/Rg) -> proteccion -> ADC
+* Uso: python3 simular.py   (lee este archivo; RV1 y la entrada se fijan con .param)
+
+.param RV=100k
+.param ACM=1m
+
+* ---------------- modelo de LM324 (macro: GBW 1 MHz, Aol 100 dB, salida 0.02 .. VCC-1.5 V)
+.subckt LM324 inp inn out vcc vee
+Rin inp inn 1meg
+G1 0 n1 inp inn 1m
+R1 n1 0 100meg
+C1 n1 0 15.9p
+B1 out 0 V = max(min(V(n1), V(vcc)-1.5), V(vee)+0.02)
+.ends
+
+* ---------------- fuentes
+V5  vcc 0 5
+V33 v33 0 3.3
+
+* ---------------- Dos referencias de 1.32 V = 3.3*2.2k/(3.3k+2.2k), cada una desacoplada.
+* VREF1: entrada y preamp.  VREF2: etapa final (su corriente de Rg no regresa a la entrada).
+Rra v33 vref 3.3k
+Rrb vref 0 2.2k
+Cra vref 0 100u
+Crb vref 0 100n
+Rrc v33 vref2 3.3k
+Rrd vref2 0 2.2k
+Crc vref2 0 100u
+Crd vref2 0 100n
+
+* ---------------- 1 Sensor (Thevenin del fotodiodo + R2 47k): DC 0.5 V + pulso + 60 Hz
+* Vsig: DC, AC (para .ac) y transitorio definido desde simular.py (PWL)
+Vsig sraw 0 DC 0.5 AC {ACM}
+R2  sraw s 47k
+
+* ---------------- 2 Acoplamiento AC: fHP = 1/(2*pi*470k*1u) = 0.34 Hz
+C1 s n1 1u
+R3 n1 vref 470k
+
+* ---------------- 3 Buffer U1A
+XU1A n1 b b vcc 0 LM324
+
+* ---------------- 4 Preamp U1B no inversor: A = 1 + 300k/10k = 31; Cf -> fLP 11.3 Hz; Rg a VREF1
+XU1B b inv1 p vcc 0 LM324
+R5 p inv1 300k
+C5 p inv1 47n
+R4 inv1 vref 10k
+
+* ---------------- 5 Sallen-Key U1C (ganancia 1): f0 = 4.94 Hz, Q = 0.73
+R6 p a 47k
+R7 a bb 47k
+C3 a sk 1u
+C2 bb 0 470n
+XU1C bb sk sk vcc 0 LM324
+
+* ---------------- acople AC 2 (quita el offset del preamp): 0.34 Hz
+C8 sk n2 1u
+R11 n2 vref2 470k
+
+* ---------------- 6 Final U1D: A = 1 + (10k+RV)/10k = 2..22 (RV1 200k); Rg a VREF2
+XU1D n2 inv2 f vcc 0 LM324
+R9  f x9 10k
+RV1 x9 inv2 {RV}
+C9  f inv2 10n
+R8  inv2 vref2 10k
+
+* ---------------- protección del ADC (Punto 6)
+R10 f adc 4.7k
+C7  adc 0 100n
+D2  adc v33 BAT85
+D3  0 adc BAT85
+.model BAT85 D(Is=2.5u N=1.05 Rs=4 Cjo=10p BV=30)
+
+.end

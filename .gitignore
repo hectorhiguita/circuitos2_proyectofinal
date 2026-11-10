@@ -1,0 +1,44 @@
+# ====================================================================
+#  .gitignore del proyecto — Medidor PPG (ITM)
+#  Protege secretos y evita subir archivos generados pesados.
+# ====================================================================
+
+# --- SECRETOS (nunca subir) ---
+desarrollo/04_iot/.env
+desarrollo/03_firmware/include/secrets.h
+desarrollo/04_iot/mosquitto/config/passwd
+desarrollo/04_iot/mosquitto/config/acl
+desarrollo/04_iot/nodered/data/flows_cred.json
+
+# --- Firmware PlatformIO (compilados) ---
+desarrollo/03_firmware/.pio/
+
+# --- IoT: datos de ejecución ---
+desarrollo/04_iot/mosquitto/data/
+desarrollo/04_iot/nodered/data/.config.*
+desarrollo/04_iot/nodered/data/.flows*.backup
+desarrollo/04_iot/nodered/data/flows*.backup
+desarrollo/04_iot/nodered/data/context/
+desarrollo/04_iot/nodered/data/lib/
+desarrollo/04_iot/nodered/data/node_modules/
+desarrollo/04_iot/nodered/data/registros/
+desarrollo/04_iot/simulador/.venv/
+
+# --- KiCad (temporales y autosalvados) ---
+desarrollo/02_pcb/*-backups/
+desarrollo/02_pcb/*.kicad_prl
+desarrollo/02_pcb/fp-info-cache
+desarrollo/02_pcb/~*.*
+desarrollo/02_pcb/_autosave-*
+
+# --- Python ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# --- Sistema / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp

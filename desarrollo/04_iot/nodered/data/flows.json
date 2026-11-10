@@ -1,0 +1,1124 @@
+[
+  {
+    "id": "tab_pulso",
+    "type": "tab",
+    "label": "Medidor PPG",
+    "disabled": false,
+    "info": "Flujo del Medidor de ritmo cardiaco PPG. Ver 04_iot/README.md"
+  },
+  {
+    "id": "mqtt_broker",
+    "type": "mqtt-broker",
+    "name": "Mosquitto local",
+    "broker": "${MQTT_HOST}",
+    "port": "${MQTT_PORT}",
+    "clientid": "nodered-pulso",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "email_alertas",
+    "type": "e-mail",
+    "z": "tab_pulso",
+    "name": "Correo de alerta",
+    "server": "${SMTP_HOST}",
+    "port": "${SMTP_PORT}",
+    "secure": true,
+    "tls": true,
+    "authtype": "BASIC",
+    "dname": "",
+    "to": "",
+    "x": 1250,
+    "y": 520,
+    "wires": []
+  },
+  {
+    "id": "ui_base",
+    "type": "ui-base",
+    "name": "Medidor PPG",
+    "path": "/dashboard",
+    "appIcon": "",
+    "includeClientData": true,
+    "acceptsClientConfig": [
+      "ui-notification",
+      "ui-control"
+    ],
+    "showPathInSidebar": false,
+    "headerContent": "page",
+    "navigationStyle": "default",
+    "titleBarStyle": "default",
+    "showReconnectNotification": true,
+    "notificationDisplayTime": 1,
+    "showDisconnectNotification": true,
+    "allowInstall": false
+  },
+  {
+    "id": "ui_tema",
+    "type": "ui-theme",
+    "name": "Tema PPG",
+    "colors": {
+      "surface": "#b71c1c",
+      "primary": "#d32f2f",
+      "bgPage": "#f6f6f8",
+      "groupBg": "#ffffff",
+      "groupOutline": "#e0e0e6"
+    },
+    "sizes": {
+      "density": "default",
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "8px",
+      "widgetGap": "12px"
+    }
+  },
+  {
+    "id": "ui_pagina",
+    "type": "ui-page",
+    "name": "Monitor de pulso",
+    "ui": "ui_base",
+    "path": "/",
+    "icon": "heart-pulse",
+    "layout": "grid",
+    "theme": "ui_tema",
+    "breakpoints": [
+      {
+        "name": "Default",
+        "px": "0",
+        "cols": "3"
+      },
+      {
+        "name": "Tablet",
+        "px": "576",
+        "cols": "6"
+      },
+      {
+        "name": "Small Desktop",
+        "px": "768",
+        "cols": "9"
+      },
+      {
+        "name": "Desktop",
+        "px": "1024",
+        "cols": "12"
+      }
+    ],
+    "order": 1,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "g_vivo",
+    "type": "ui-group",
+    "name": "Pulso en vivo",
+    "page": "ui_pagina",
+    "width": "3",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "g_onda",
+    "type": "ui-group",
+    "name": "Onda PPG (Punto 6)",
+    "page": "ui_pagina",
+    "width": "9",
+    "height": "1",
+    "order": 2,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "g_hist",
+    "type": "ui-group",
+    "name": "Historial de BPM (30 min)",
+    "page": "ui_pagina",
+    "width": "6",
+    "height": "1",
+    "order": 3,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "g_equipo",
+    "type": "ui-group",
+    "name": "Estado del equipo",
+    "page": "ui_pagina",
+    "width": "3",
+    "height": "1",
+    "order": 4,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "g_ajustes",
+    "type": "ui-group",
+    "name": "Umbrales de alerta",
+    "page": "ui_pagina",
+    "width": "3",
+    "height": "1",
+    "order": 5,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "g_alertas",
+    "type": "ui-group",
+    "name": "Registro de alertas",
+    "page": "ui_pagina",
+    "width": "12",
+    "height": "1",
+    "order": 6,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false",
+    "groupType": "default"
+  },
+  {
+    "id": "in_estado",
+    "type": "mqtt in",
+    "name": "pulso/+/estado",
+    "topic": "pulso/+/estado",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "mqtt_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 130,
+    "y": 80,
+    "wires": [
+      [
+        "f_estado"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "in_onda",
+    "type": "mqtt in",
+    "name": "pulso/+/onda",
+    "topic": "pulso/+/onda",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "mqtt_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 130,
+    "y": 220,
+    "wires": [
+      [
+        "f_onda"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "in_online",
+    "type": "mqtt in",
+    "name": "pulso/+/online",
+    "topic": "pulso/+/online",
+    "qos": "0",
+    "datatype": "utf8",
+    "broker": "mqtt_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 130,
+    "y": 300,
+    "wires": [
+      [
+        "f_online"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "in_alerta",
+    "type": "mqtt in",
+    "name": "pulso/+/alerta",
+    "topic": "pulso/+/alerta",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "mqtt_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 130,
+    "y": 380,
+    "wires": [
+      [
+        "f_alerta_eq"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "in_config",
+    "type": "mqtt in",
+    "name": "pulso/+/config",
+    "topic": "pulso/+/config",
+    "qos": "0",
+    "datatype": "json",
+    "broker": "mqtt_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 130,
+    "y": 640,
+    "wires": [
+      [
+        "f_config_rx"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_estado",
+    "type": "function",
+    "name": "Estado del equipo",
+    "func": "// Filtra por DEVICE_ID y guarda el último estado\nconst id = msg.topic.split('/')[1];\nif (id !== (env.get('DEVICE_ID') || 'medidor01')) return null;\nconst e = msg.payload;\nif (typeof e !== 'object' || e === null) return null;\nconst ahora = Date.now();\nflow.set('ultimo_estado', ahora);\nflow.set('estado', e);\nconst bpmTxt = (e.dedo && e.bpm > 0) ? String(e.bpm) : '--';\nconst zona = !e.dedo ? 'Sin dedo' : !e.senal_ok ? 'Señal débil' : 'Midiendo';\nreturn [\n  { payload: bpmTxt },\n  (e.dedo && e.bpm > 0) ? { payload: e.bpm } : null,\n  (e.dedo && e.bpm > 0) ? { topic: 'BPM', payload: e.bpm, timestamp: ahora } : null,\n  [\n    { payload: zona },\n    { payload: (e.bat_pct !== undefined ? e.bat_pct + ' %  ' : '') + (e.bat_v !== undefined ? e.bat_v.toFixed(2) + ' V' : '') },\n    { payload: (e.rssi !== undefined ? e.rssi + ' dBm' : '--') },\n    { payload: new Date(ahora).toLocaleTimeString('es-CO', { timeZone: env.get('TZ') || 'America/Bogota' }) }\n  ],\n  { topic: 'estado', payload: e },\n  { payload: e }\n];",
+    "outputs": 6,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 80,
+    "wires": [
+      [
+        "t_bpm"
+      ],
+      [
+        "gauge_bpm"
+      ],
+      [
+        "chart_hist"
+      ],
+      [
+        "t_senal",
+        "t_bat",
+        "t_rssi",
+        "t_hora"
+      ],
+      [
+        "f_motor"
+      ],
+      [
+        "f_csv"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_onda",
+    "type": "function",
+    "name": "Onda -> puntos",
+    "func": "const id = msg.topic.split('/')[1];\nif (id !== (env.get('DEVICE_ID') || 'medidor01')) return null;\nconst p = msg.payload;\nif (!p || !Array.isArray(p.v)) return null;\n// Hora local del servidor; el t0 del equipo es millis() desde el arranque.\nconst fs = p.fs || 50, dt = 1000 / fs;\nlet t = context.get('t') || 0;\nconst ahora = Date.now();\nif (ahora - t > 1500 || t > ahora + 1500) t = ahora - p.v.length * dt;\nconst puntos = p.v.map((mv) => { t += dt; return { x: Math.round(t), y: mv / 1000 }; });\ncontext.set('t', t);\nconst salida = [{ payload: puntos }];\nif (String(env.get('LOG_ONDA')) === 'true') salida.push({ onda: puntos });\nelse salida.push(null);\nreturn salida;",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 220,
+    "wires": [
+      [
+        "chart_onda"
+      ],
+      [
+        "f_csv"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_online",
+    "type": "function",
+    "name": "En línea",
+    "func": "const id = msg.topic.split('/')[1];\nif (id !== (env.get('DEVICE_ID') || 'medidor01')) return null;\nconst on = String(msg.payload) === '1';\nflow.set('online', on);\nif (on) flow.set('ultimo_estado', Date.now());\nreturn [{ payload: on ? 'En línea' : 'Desconectado' }, { topic: 'online', payload: on }];",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 300,
+    "wires": [
+      [
+        "t_online"
+      ],
+      [
+        "f_motor"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_alerta_eq",
+    "type": "function",
+    "name": "Alerta del equipo",
+    "func": "const id = msg.topic.split('/')[1];\nif (id !== (env.get('DEVICE_ID') || 'medidor01')) return null;\nmsg.topic = 'alerta_equipo';\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 380,
+    "wires": [
+      [
+        "f_motor"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "tick",
+    "type": "inject",
+    "name": "cada 5 s",
+    "props": [
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "5",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "5",
+    "topic": "tick",
+    "x": 130,
+    "y": 440,
+    "wires": [
+      [
+        "f_motor"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_motor",
+    "type": "function",
+    "name": "Motor de alertas",
+    "func": "const ahora = Date.now();\nconst cfg = flow.get('config') || { bpm_min: Number(env.get('BPM_MIN') || 50), bpm_max: Number(env.get('BPM_MAX') || 120) };\nconst enfr = Number(env.get('ALERT_COOLDOWN_S') || 300) * 1000;\nconst enfrBat = 30 * 60 * 1000;\nlet s = context.get('s') || { fuera: {}, hist: [], ult: {}, ultimaValida: 0, sinDedoDesde: 0, desconectado: false };\n\nfunction disparar(tipo, bpm, umbral, detalle, origen) {\n  const cd = tipo === 'bateria_baja' ? enfrBat : enfr;\n  if (s.ult[tipo] && ahora - s.ult[tipo] < cd) return null;\n  s.ult[tipo] = ahora;\n  return { topic: 'alerta', payload: { tipo, bpm, umbral, detalle, origen: origen || 'servidor', t: ahora } };\n}\nconst salida = [];\n\nif (msg.topic === 'alerta_equipo') {\n  const a = msg.payload || {};\n  // El equipo también decide; se registra, pero el envío comparte enfriamiento con el servidor.\n  const r = disparar(a.tipo || 'equipo', a.bpm || 0, a.umbral || null, 'Reportada por el equipo', 'equipo');\n  if (r) salida.push(r);\n}\n\nif (msg.topic === 'estado') {\n  const e = msg.payload;\n  s.desconectado = false;\n  const valido = e.dedo && e.senal_ok && e.bpm > 0;\n  if (valido) {\n    s.ultimaValida = ahora;\n    s.sinDedoDesde = 0;\n    // Hueco > 5 s (sin dedo, reconexión): la tendencia empieza de cero\n    const ultH = s.hist[s.hist.length - 1];\n    if (ultH && ahora - ultH.t > 5000) s.hist = [];\n    s.hist.push({ t: ahora, bpm: e.bpm });\n    s.hist = s.hist.filter((h) => ahora - h.t <= 35000);\n    // Fuera de rango sostenido 10 s\n    for (const [tipo, cond, umbral] of [['alto', e.bpm > cfg.bpm_max, cfg.bpm_max], ['bajo', e.bpm < cfg.bpm_min, cfg.bpm_min]]) {\n      if (cond) {\n        s.fuera[tipo] = s.fuera[tipo] || ahora;\n        if (ahora - s.fuera[tipo] >= 10000) {\n          const r = disparar(tipo, e.bpm, umbral, (tipo === 'alto' ? 'Pulso alto' : 'Pulso bajo') + ' por más de 10 s');\n          if (r) salida.push(r);\n        }\n      } else s.fuera[tipo] = 0;\n    }\n    // Tendencia: cambio > 25 lpm en 30 s (alerta temprana)\n    const viejo = s.hist.find((h) => ahora - h.t >= 28000);\n    if (viejo) {\n      const d = e.bpm - viejo.bpm;\n      if (d > 25) { const r = disparar('subida_rapida', e.bpm, null, 'Subió ' + d + ' lpm en 30 s'); if (r) salida.push(r); }\n      if (d < -25) { const r = disparar('bajada_rapida', e.bpm, null, 'Bajó ' + (-d) + ' lpm en 30 s'); if (r) salida.push(r); }\n    }\n  } else {\n    s.fuera = {};\n    if (!s.sinDedoDesde) s.sinDedoDesde = ahora;\n    // Señal perdida a mitad de una medición (hubo lectura válida en los últimos 5 min)\n    if (ahora - s.sinDedoDesde >= 60000 && ahora - s.ultimaValida < 5 * 60000) {\n      const r = disparar('sin_senal', 0, null, 'Sin señal válida por 60 s'); if (r) salida.push(r);\n    }\n  }\n  if (typeof e.bat_v === 'number' && e.bat_v > 0 && e.bat_v < 3.4) {\n    const r = disparar('bateria_baja', e.bpm || 0, 3.4, 'Batería ' + e.bat_v.toFixed(2) + ' V (' + (e.bat_pct ?? '?') + ' %)');\n    if (r) salida.push(r);\n  }\n}\n\nif (msg.topic === 'online' && msg.payload === false) {\n  s.hist = [];\n  if (!s.desconectado) { s.desconectado = true; const r = disparar('desconectado', 0, null, 'El equipo se desconectó (LWT)'); if (r) salida.push(r); }\n}\n\nif (msg.topic === 'tick') {\n  const ult = flow.get('ultimo_estado') || 0;\n  if (ult && ahora - ult > 60000 && !s.desconectado) {\n    s.desconectado = true;\n    const r = disparar('desconectado', 0, null, 'Sin datos del equipo por 60 s');\n    if (r) salida.push(r);\n  }\n}\n\ncontext.set('s', s);\nreturn [salida];",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 620,
+    "y": 380,
+    "wires": [
+      [
+        "f_tabla",
+        "f_csv"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_tabla",
+    "type": "function",
+    "name": "Formato alerta",
+    "func": "const a = msg.payload;\nconst nombres = { alto: 'Pulso alto', bajo: 'Pulso bajo', subida_rapida: 'Subida rápida', bajada_rapida: 'Bajada rápida',\n  sin_senal: 'Sin señal', desconectado: 'Equipo desconectado', bateria_baja: 'Batería baja' };\nconst hora = new Date(a.t).toLocaleString('es-CO', { timeZone: env.get('TZ') || 'America/Bogota' });\nconst fila = { Hora: hora, Tipo: nombres[a.tipo] || a.tipo, BPM: a.bpm || '--', Detalle: a.detalle, Origen: a.origen };\nconst notif = { payload: '⚠ ' + fila.Tipo + (a.bpm ? ' — ' + a.bpm + ' lpm' : '') + '. ' + a.detalle };\nmsg.texto = '⚠ ALERTA Medidor PPG (' + (env.get('DEVICE_ID') || 'medidor01') + ')\\n' + fila.Tipo +\n  (a.bpm ? ': ' + a.bpm + ' lpm' : '') + (a.umbral ? ' (umbral ' + a.umbral + ')' : '') + '\\n' + a.detalle + '\\n' + hora;\nmsg.fila = fila;\nreturn [{ payload: [fila] }, notif, msg];",
+    "outputs": 3,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 860,
+    "y": 380,
+    "wires": [
+      [
+        "tabla_alertas"
+      ],
+      [
+        "notif"
+      ],
+      [
+        "f_correo",
+        "f_wa"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_correo",
+    "type": "function",
+    "name": "Correo (si hay SMTP)",
+    "func": "const user = (env.get('SMTP_USER') || '').trim();\nconst to = (env.get('EMAIL_TO') || '').trim();\nif (!user || !to) { node.warn('[correo] no configurado, se enviaría: ' + msg.texto.replace(/\\n/g, ' | ')); return null; }\nreturn { to, from: user, topic: 'Alerta Medidor PPG: ' + msg.fila.Tipo, payload: msg.texto };",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1060,
+    "y": 520,
+    "wires": [
+      [
+        "email_alertas"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_wa",
+    "type": "function",
+    "name": "WhatsApp CallMeBot",
+    "func": "const tels = (env.get('CALLMEBOT_PHONE') || '').split(',').map((x) => x.trim()).filter(Boolean);\nconst keys = (env.get('CALLMEBOT_APIKEY') || '').split(',').map((x) => x.trim()).filter(Boolean);\nif (!tels.length || tels.length !== keys.length) {\n  node.warn('[whatsapp] no configurado, se enviaría: ' + msg.texto.replace(/\\n/g, ' | '));\n  return null;\n}\nreturn [tels.map((tel, i) => ({\n  url: 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(tel) +\n       '&text=' + encodeURIComponent(msg.texto) + '&apikey=' + encodeURIComponent(keys[i]),\n  method: 'GET', telefono: tel\n}))];",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1060,
+    "y": 580,
+    "wires": [
+      [
+        "http_wa"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "http_wa",
+    "type": "http request",
+    "name": "CallMeBot",
+    "method": "use",
+    "ret": "txt",
+    "paytoqs": "ignore",
+    "url": "",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+    "x": 1250,
+    "y": 580,
+    "wires": [
+      [
+        "f_resp_wa"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_resp_wa",
+    "type": "function",
+    "name": "Resultado WhatsApp",
+    "func": "if (msg.statusCode !== 200) node.warn('[whatsapp] ' + msg.telefono + ' respondió ' + msg.statusCode + ': ' + String(msg.payload).slice(0, 200));\nelse node.log('[whatsapp] enviado a ' + msg.telefono);\nreturn null;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1430,
+    "y": 580,
+    "wires": [
+      []
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_csv",
+    "type": "function",
+    "name": "Registro CSV",
+    "func": "const fs = global.get('fs'), path = global.get('path');\nconst dir = '/data/registros';\nconst d = new Date();\nconst dia = d.toLocaleDateString('sv-SE', { timeZone: env.get('TZ') || 'America/Bogota' });\nconst iso = d.toISOString();\ntry { fs.mkdirSync(dir, { recursive: true }); } catch (e) {}\nfunction escribir(nombre, cab, linea) {\n  const f = path.join(dir, nombre + '_' + dia + '.csv');\n  if (!fs.existsSync(f)) fs.writeFileSync(f, cab + '\\n');\n  fs.appendFileSync(f, linea + '\\n');\n}\nif (msg.topic === 'alerta') {\n  const a = msg.payload;\n  escribir('alertas', 'fecha_iso,tipo,bpm,umbral,origen,detalle', [iso, a.tipo, a.bpm, a.umbral ?? '', a.origen, '\"' + a.detalle + '\"'].join(','));\n} else if (msg.onda) {\n  escribir('onda', 'tiempo_ms,voltaje_v', msg.onda.map((p) => p.x + ',' + p.y.toFixed(4)).join('\\n'));\n} else {\n  const e = msg.payload;\n  escribir('estado', 'fecha_iso,bpm,dedo,senal_ok,bat_v,bat_pct,rssi', [iso, e.bpm, e.dedo, e.senal_ok, e.bat_v ?? '', e.bat_pct ?? '', e.rssi ?? ''].join(','));\n}\nreturn null;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 860,
+    "y": 160,
+    "wires": [
+      []
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_config_rx",
+    "type": "function",
+    "name": "Config retenida",
+    "func": "const id = msg.topic.split('/')[1];\nif (id !== (env.get('DEVICE_ID') || 'medidor01')) return null;\nconst c = msg.payload;\nif (typeof c !== 'object' || c === null) return null;\nflow.set('config', c);\nreturn { payload: { bpm_min: c.bpm_min, bpm_max: c.bpm_max, buzzer: !!c.buzzer } };",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 640,
+    "wires": [
+      [
+        "form_cfg"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "cfg_arranque",
+    "type": "inject",
+    "name": "al arrancar",
+    "props": [],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "4",
+    "topic": "",
+    "x": 130,
+    "y": 700,
+    "wires": [
+      [
+        "f_config_def"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_config_def",
+    "type": "function",
+    "name": "Config por defecto",
+    "func": "// Al arrancar: si el broker no tenía config retenida, publica la de .env\nif (flow.get('config')) return null;\nconst c = { bpm_min: Number(env.get('BPM_MIN') || 50), bpm_max: Number(env.get('BPM_MAX') || 120), buzzer: true };\nflow.set('config', c);\nreturn { topic: 'pulso/' + (env.get('DEVICE_ID') || 'medidor01') + '/config', payload: c, retain: true, qos: 1 };",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 700,
+    "wires": [
+      [
+        "out_config"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "f_config_tx",
+    "type": "function",
+    "name": "Validar y publicar",
+    "func": "const p = msg.payload || {};\nlet min = Math.round(Number(p.bpm_min)), max = Math.round(Number(p.bpm_max));\nif (!(min >= 30 && max <= 220 && min < max)) {\n  node.warn('Umbrales inválidos: ' + JSON.stringify(p));\n  return [null, { payload: 'Umbrales inválidos: mínimo ≥ 30, máximo ≤ 220 y mínimo < máximo.' }];\n}\nconst c = { bpm_min: min, bpm_max: max, buzzer: !!p.buzzer };\nflow.set('config', c);\nreturn [{ topic: 'pulso/' + (env.get('DEVICE_ID') || 'medidor01') + '/config', payload: c, retain: true, qos: 1 },\n        { payload: 'Umbrales guardados: ' + min + '–' + max + ' lpm' }];",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 860,
+    "y": 660,
+    "wires": [
+      [
+        "out_config"
+      ],
+      [
+        "notif"
+      ]
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "out_config",
+    "type": "mqtt out",
+    "name": "config (retenido)",
+    "topic": "",
+    "qos": "",
+    "retain": "",
+    "respTopic": "",
+    "contentType": "",
+    "userProps": "",
+    "correl": "",
+    "expiry": "",
+    "broker": "mqtt_broker",
+    "x": 1080,
+    "y": 680,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "t_bpm",
+    "type": "ui-text",
+    "group": "g_vivo",
+    "order": 1,
+    "width": "0",
+    "height": "0",
+    "name": "BPM",
+    "label": "BPM",
+    "format": "{{msg.payload}}",
+    "layout": "col-center",
+    "style": true,
+    "font": "Helvetica",
+    "fontSize": 56,
+    "color": "#222222",
+    "wrapText": false,
+    "className": "",
+    "value": "payload",
+    "valueType": "msg",
+    "x": 620,
+    "y": 40,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "gauge_bpm",
+    "type": "ui-gauge",
+    "name": "BPM",
+    "group": "g_vivo",
+    "order": 2,
+    "width": "0",
+    "height": "4",
+    "gtype": "gauge-half",
+    "gstyle": "rounded",
+    "title": "Frecuencia cardiaca",
+    "alwaysShowTitle": false,
+    "floatingTitlePosition": "top-left",
+    "units": "lpm",
+    "icon": "heart",
+    "prefix": "",
+    "suffix": "",
+    "segments": [
+      {
+        "from": "30",
+        "color": "#1e88e5",
+        "text": "",
+        "textType": "label"
+      },
+      {
+        "from": "50",
+        "color": "#43a047",
+        "text": "",
+        "textType": "label"
+      },
+      {
+        "from": "100",
+        "color": "#fbc02d",
+        "text": "",
+        "textType": "label"
+      },
+      {
+        "from": "120",
+        "color": "#e53935",
+        "text": "",
+        "textType": "label"
+      }
+    ],
+    "min": "30",
+    "max": "200",
+    "sizeThickness": 16,
+    "sizeGap": 4,
+    "sizeKeyThickness": 8,
+    "styleRounded": true,
+    "styleGlow": false,
+    "className": "",
+    "value": "payload",
+    "valueType": "msg",
+    "x": 620,
+    "y": 80,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "chart_onda",
+    "type": "ui-chart",
+    "group": "g_onda",
+    "name": "Voltaje (V)",
+    "label": "Voltaje (V)",
+    "order": 1,
+    "chartType": "line",
+    "category": "PPG",
+    "categoryType": "str",
+    "xAxisLabel": "",
+    "xAxisProperty": "x",
+    "xAxisPropertyType": "property",
+    "xAxisType": "time",
+    "xAxisFormat": "HH:mm:ss",
+    "xAxisFormatType": "custom",
+    "xmin": "",
+    "xmax": "",
+    "yAxisLabel": "V",
+    "yAxisProperty": "y",
+    "yAxisPropertyType": "property",
+    "ymin": "0",
+    "ymax": "2.5",
+    "bins": 10,
+    "action": "append",
+    "stackSeries": false,
+    "pointShape": "false",
+    "pointRadius": 0,
+    "showLegend": false,
+    "removeOlder": "1",
+    "removeOlderUnit": "3600",
+    "removeOlderPoints": "300",
+    "colors": [
+      "#d32f2f",
+      "#1e88e5",
+      "#43a047",
+      "#fbc02d",
+      "#8e24aa",
+      "#00acc1",
+      "#f4511e",
+      "#6d4c41",
+      "#546e7a"
+    ],
+    "textColor": [
+      "#666666"
+    ],
+    "textColorDefault": true,
+    "gridColor": [
+      "#e5e5e5"
+    ],
+    "gridColorDefault": true,
+    "width": "0",
+    "height": "6",
+    "className": "",
+    "interpolation": "linear",
+    "x": 620,
+    "y": 220,
+    "wires": [
+      []
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "chart_hist",
+    "type": "ui-chart",
+    "group": "g_hist",
+    "name": "BPM",
+    "label": "BPM",
+    "order": 1,
+    "chartType": "line",
+    "category": "topic",
+    "categoryType": "msg",
+    "xAxisLabel": "",
+    "xAxisProperty": "",
+    "xAxisPropertyType": "timestamp",
+    "xAxisType": "time",
+    "xAxisFormat": "HH:mm",
+    "xAxisFormatType": "custom",
+    "xmin": "",
+    "xmax": "",
+    "yAxisLabel": "lpm",
+    "yAxisProperty": "payload",
+    "yAxisPropertyType": "msg",
+    "ymin": "30",
+    "ymax": "200",
+    "bins": 10,
+    "action": "append",
+    "stackSeries": false,
+    "pointShape": "circle",
+    "pointRadius": 2,
+    "showLegend": false,
+    "removeOlder": "30",
+    "removeOlderUnit": "60",
+    "removeOlderPoints": "",
+    "colors": [
+      "#d32f2f",
+      "#1e88e5",
+      "#43a047",
+      "#fbc02d",
+      "#8e24aa",
+      "#00acc1",
+      "#f4511e",
+      "#6d4c41",
+      "#546e7a"
+    ],
+    "textColor": [
+      "#666666"
+    ],
+    "textColorDefault": true,
+    "gridColor": [
+      "#e5e5e5"
+    ],
+    "gridColorDefault": true,
+    "width": "0",
+    "height": "5",
+    "className": "",
+    "interpolation": "linear",
+    "x": 620,
+    "y": 120,
+    "wires": [
+      []
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "t_online",
+    "type": "ui-text",
+    "group": "g_equipo",
+    "order": 1,
+    "width": "0",
+    "height": "0",
+    "name": "Conexión",
+    "label": "Conexión",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "Helvetica",
+    "fontSize": 16,
+    "color": "#222222",
+    "wrapText": false,
+    "className": "",
+    "value": "payload",
+    "valueType": "msg",
+    "x": 620,
+    "y": 300,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "t_senal",
+    "type": "ui-text",
+    "group": "g_equipo",
+    "order": 2,
+    "width": "0",
+    "height": "0",
+    "name": "Señal",
+    "label": "Señal",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "Helvetica",
+    "fontSize": 16,
+    "color": "#222222",
+    "wrapText": false,
+    "className": "",
+    "value": "payload",
+    "valueType": "msg",
+    "x": 620,
+    "y": 160,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "t_bat",
+    "type": "ui-text",
+    "group": "g_equipo",
+    "order": 3,
+    "width": "0",
+    "height": "0",
+    "name": "Batería",
+    "label": "Batería",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "Helvetica",
+    "fontSize": 16,
+    "color": "#222222",
+    "wrapText": false,
+    "className": "",
+    "value": "payload",
+    "valueType": "msg",
+    "x": 620,
+    "y": 180,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "t_rssi",
+    "type": "ui-text",
+    "group": "g_equipo",
+    "order": 4,
+    "width": "0",
+    "height": "0",
+    "name": "WiFi",
+    "label": "WiFi",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "Helvetica",
+    "fontSize": 16,
+    "color": "#222222",
+    "wrapText": false,
+    "className": "",
+    "value": "payload",
+    "valueType": "msg",
+    "x": 620,
+    "y": 200,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "t_hora",
+    "type": "ui-text",
+    "group": "g_equipo",
+    "order": 5,
+    "width": "0",
+    "height": "0",
+    "name": "Último dato",
+    "label": "Último dato",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "Helvetica",
+    "fontSize": 16,
+    "color": "#222222",
+    "wrapText": false,
+    "className": "",
+    "value": "payload",
+    "valueType": "msg",
+    "x": 620,
+    "y": 240,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "tabla_alertas",
+    "type": "ui-table",
+    "group": "g_alertas",
+    "name": "Alertas",
+    "label": "",
+    "order": 1,
+    "width": "0",
+    "height": "0",
+    "maxrows": 10,
+    "passthru": false,
+    "autocols": true,
+    "showSearch": false,
+    "deselect": true,
+    "selectionType": "none",
+    "columns": [],
+    "mobileBreakpoint": "sm",
+    "mobileBreakpointType": "defaults",
+    "action": "append",
+    "className": "",
+    "x": 1060,
+    "y": 340,
+    "wires": [
+      []
+    ],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "notif",
+    "type": "ui-notification",
+    "ui": "ui_base",
+    "position": "top right",
+    "colorDefault": false,
+    "color": "#d32f2f",
+    "displayTime": "8",
+    "showCountdown": true,
+    "outputs": 0,
+    "allowDismiss": true,
+    "dismissText": "Cerrar",
+    "allowConfirm": false,
+    "confirmText": "",
+    "raw": false,
+    "className": "",
+    "name": "Aviso",
+    "x": 1060,
+    "y": 400,
+    "wires": [],
+    "z": "tab_pulso"
+  },
+  {
+    "id": "form_cfg",
+    "type": "ui-form",
+    "group": "g_ajustes",
+    "name": "Umbrales",
+    "label": "",
+    "order": 1,
+    "width": "0",
+    "height": "0",
+    "options": [
+      {
+        "label": "BPM mínimo",
+        "key": "bpm_min",
+        "type": "number",
+        "required": true,
+        "rows": null
+      },
+      {
+        "label": "BPM máximo",
+        "key": "bpm_max",
+        "type": "number",
+        "required": true,
+        "rows": null
+      },
+      {
+        "label": "Pitido en cada latido",
+        "key": "buzzer",
+        "type": "checkbox",
+        "required": false,
+        "rows": null
+      }
+    ],
+    "formValue": {
+      "bpm_min": "50",
+      "bpm_max": "120",
+      "buzzer": true
+    },
+    "payload": "",
+    "submit": "Guardar",
+    "cancel": "Restaurar",
+    "resetOnSubmit": false,
+    "topic": "topic",
+    "topicType": "msg",
+    "splitLayout": "",
+    "className": "",
+    "passthru": false,
+    "dropdownOptions": [],
+    "x": 620,
+    "y": 660,
+    "wires": [
+      [
+        "f_config_tx"
+      ]
+    ],
+    "z": "tab_pulso"
+  }
+]

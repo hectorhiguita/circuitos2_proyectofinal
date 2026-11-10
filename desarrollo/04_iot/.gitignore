@@ -1,0 +1,15 @@
+# Secretos y datos generados - no versionar
+.env
+mosquitto/config/passwd
+mosquitto/config/acl
+mosquitto/data/
+nodered/data/flows_cred.json
+nodered/data/.config.*
+nodered/data/.flows*.backup
+nodered/data/flows*.backup
+nodered/data/context/
+nodered/data/lib/
+nodered/data/node_modules/
+nodered/data/registros/
+simulador/.venv/
+__pycache__/

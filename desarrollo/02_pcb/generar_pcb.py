@@ -19,7 +19,7 @@ NOMBRE = "medidor_ppg"
 FP = "/usr/share/kicad/footprints"
 FR = Path.home() / "Tools/freerouting/linux-x64/freerouting-2.2.4-linux-x64/bin/freerouting"
 OX, OY = 100.0, 100.0          # origen de la placa en la hoja
-W, H = 80.0, 52.0
+W, H = 66.0, 48.0
 _NS = uuid.UUID("5e1a0000-0000-4000-8000-00000000a1a1")   # mismo que el esquema
 
 
@@ -108,9 +108,9 @@ def main():
     ds.SetCopperLayerCount(2)
     nc = ds.m_NetSettings.GetDefaultNetclass()
     nc.SetTrackWidth(pcbnew.FromMM(0.4))
-    nc.SetClearance(pcbnew.FromMM(0.25))
-    nc.SetViaDiameter(pcbnew.FromMM(0.9))
-    nc.SetViaDrill(pcbnew.FromMM(0.45))
+    nc.SetClearance(pcbnew.FromMM(0.25))     # proveedor: >= 0.2 mm pista/pad
+    nc.SetViaDiameter(pcbnew.FromMM(1.2))    # anillo via = (1.2-0.4)/2*2 = 0.8 mm
+    nc.SetViaDrill(pcbnew.FromMM(0.4))
 
     # ---------------------------------------------------------------- redes
     redes = {}
@@ -136,6 +136,15 @@ def main():
             n = c["nets"].get(p.GetNumber())
             if n:
                 p.SetNet(redes[n])
+            # Regla del proveedor: diametro del pad - agujero >= 0.8 mm (anillo para soldar).
+            ds_ = p.GetDrillSize()
+            drill = pcbnew.ToMM(ds_.x)
+            if drill > 0:
+                objetivo = pcbnew.FromMM(drill + 0.9)   # 0.9 > 0.8 exigido, margen de seguridad
+                sz = p.GetSize()
+                nx = max(sz.x, objetivo)
+                ny = max(sz.y, objetivo)
+                p.SetSize(pcbnew.VECTOR2I(nx, ny))
         fp.Value().SetVisible(False)
         fp.Reference().SetTextSize(pcbnew.VECTOR2I(pcbnew.FromMM(0.8), pcbnew.FromMM(0.8)))
         fp.Reference().SetTextThickness(pcbnew.FromMM(0.12))
@@ -143,35 +152,33 @@ def main():
         fps[c["ref"]] = fp
 
     # ---------------------------------------------------------------- ubicación fija
-    for i, (x, y) in enumerate([(4.0, 4.0), (W - 4.0, 4.0), (4.0, H - 4.0), (W - 4.0, H - 4.0)], 1):
+    # Agujeros M3 en zonas libres (lejos de conectores y del SuperMini del borde derecho).
+    for i, (x, y) in enumerate([(4.0, 4.0), (4.0, H - 4.0), (W - 4.0, H - 4.0), (W - 4.0, 4.0)], 1):
         mover_centro(fps[f"H{i}"], x, y)
-    # SuperMini: filas a 15.24 mm, USB hacia x = 80 (la placa sobresale 0.8 mm del borde)
-    yc, x_pin1 = 34.0, 78.45
+    # SuperMini: filas a 15.24 mm, USB hacia x = W (la placa sobresale 0.8 mm del borde)
+    yc, x_pin1 = 28.0, W - 1.55
     for ref, y in (("J2", yc - 7.62), ("J3", yc + 7.62)):
         orientar_fila(fps[ref], "-x")
         mover_pad1(fps[ref], x_pin1, y)
     orientar_fila(fps["J5"], "+x")       # energía, borde superior
     mover_pad1(fps["J5"], 22.0, 3.0)
-    orientar_fila(fps["J4"], "+x")       # OLED
-    mover_pad1(fps["J4"], 58.0, 18.5)
-    orientar_fila(fps["J1"], "+y")       # sensor, borde frontal
-    mover_pad1(fps["J1"], 4.5, 15.0)
-    fps["J1"].SetOrientationDegrees(fps["J1"].GetOrientationDegrees())
-    mover_centro(fps["BZ1"], 65.5, 9.0)
+    orientar_fila(fps["J4"], "+x")       # TFT
+    mover_pad1(fps["J4"], 22.0, 15.0)
+    orientar_fila(fps["J1"], "+y")       # sensor MAX30102, borde frontal izquierdo
+    mover_pad1(fps["J1"], 8.5, 11.0)
+    mover_centro(fps["BZ1"], 50.0, 8.0)
 
     fijos = {"H1", "H2", "H3", "H4", "J1", "J2", "J3", "J4", "J5", "BZ1"}
-    ocupado = [bbox(fps[r], 0.5) for r in fijos]
+    ocupado = [bbox(fps[r], 0.6) for r in fijos]
     # zona del SuperMini completa (cuerpo 22.5 x 18 sobre zócalos)
-    ocupado.append((57.5, yc - 9.6, 81.0, yc + 9.6))
+    ocupado.append((W - 24.0, yc - 9.6, W + 0.5, yc + 9.6))
 
-    # ---------------------------------------------------------------- empaque en orden de señal
-    orden = ["R1", "R2", "TP1", "C1", "R3", "R15", "R16", "C13", "C14", "TP6", "U1", "TP2", "R4", "R5", "C5",
-             "TP3", "R6", "R7", "C3", "C2", "TP4", "C8", "R11", "R17", "R18", "C15", "C16", "R8", "R9", "RV1",
-             "C9", "TP5", "C10", "R10", "C7", "D2", "D3", "C12", "R12", "Q1", "D4", "D1", "C11", "R13", "R14",
-             "C17", "TP7"]
+    # ---------------------------------------------------------------- empaque en orden lógico
+    orden = ["C1", "R1", "R2", "R3", "TP1", "TP2", "TP3", "C2", "R4", "Q1", "D1",
+             "C3", "D2", "R5", "R6", "C4", "TP4"]
     faltan = set(fps) - fijos - set(orden)
     assert not faltan, faltan
-    x_min, y_min, x_max, y_max = 1.0, 6.5, 57.0, 51.0
+    x_min, y_min, x_max, y_max = 1.0, 22.0, 58.0, 47.0
     paso = 0.635
     for ref in orden:
         fp = fps[ref]
@@ -197,17 +204,17 @@ def main():
     # ---------------------------------------------------------------- contorno y serigrafía
     rect(board, 0, 0, W, H, pcbnew.Edge_Cuts, 0.1)
     silk(board, "MEDIDOR PPG v1 - ITM Circuitos II", 30, H - 1.2, 1.0, pcbnew.B_SilkS)
-    silk(board, "ESP32-C3 SuperMini  USB ->", 68.5, yc, 0.9)
-    for i, t in enumerate(["5V", "G", "3V3", "4", "3", "2", "1", "0"]):
+    silk(board, "ESP32-C3 SuperMini  USB ->", W - 11.5, yc, 0.9)
+    for i, t in enumerate(["5V", "G", "3V3", "4", "3", "INT", "SCL", "SDA"]):
         silk(board, t, x_pin1 - i * 2.54, yc - 7.62 - 2.2, 0.8)
     for i, t in enumerate(["5", "6", "7", "8", "9", "10", "20", "21"]):
         silk(board, t, x_pin1 - i * 2.54, yc + 7.62 + 2.2, 0.8)
     for i, t in enumerate(["B+", "SWa", "SWb", "MT+", "B-", "MT-", "5V", "G"]):
         silk(board, t, 22.0 + i * 2.54, 5.4, 0.8)
     for i, t in enumerate(["G", "V", "SCK", "SDA", "RES", "DC", "BLK"]):
-        silk(board, t, 58.0 + i * 2.54, 16.3, 0.8)
-    for i, t in enumerate(["LED+", "LED-", "PD-K", "PD-A"]):
-        silk(board, t, 9.2, 15.0 + i * 2.5, 0.8)
+        silk(board, t, 22.0 + i * 2.54, 13.0, 0.8)
+    for i, t in enumerate(["VIN", "SCL", "SDA", "INT", "IRD", "RD", "G"]):
+        silk(board, t, 13.2, 11.0 + i * 2.5, 0.8)
 
     pcbnew.SaveBoard(str(pcb_path), board)
     print("ubicado:", pcb_path)

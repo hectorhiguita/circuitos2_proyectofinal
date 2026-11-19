@@ -17,6 +17,13 @@ Placa 80 × 52 mm, 2 capas, todo THT. Plano GND en las dos caras. DRC: 0 errores
 Regenerar: `python3 generar_esquema.py && python3 generar_pcb.py && ./fabricar.sh`.
 **Riesgo:** `generar_pcb.py` sobrescribe la placa. Si la editas a mano en KiCad, no lo vuelvas a correr.
 
+## Esquema legible por bloques
+El esquema `medidor_ppg.kicad_sch` está dibujado **por etapas** (cada una en su recuadro), con la señal fluyendo de izquierda a derecha: sensor → acople → buffer → preamp → Sallen-Key → salida → protección → ADC. Lo genera `construir_esquema.py` (usa `esq_bloques_lib.py`), leyendo el mismo `componentes.py`, así que el **netlist es idéntico** al generador antiguo: la PCB, el ERC y la simulación no cambian.
+
+- Regenerar el esquema legible: `python3 construir_esquema.py`
+- Vista previa: `img/esquema_bloques.png`
+- El generador antiguo por etiquetas quedó como respaldo en `generar_esquema_etiquetas.py.bak` y el esquema anterior en `medidor_ppg.kicad_sch.bak_etiquetas`.
+
 ## Opción sin PCB: baquela perforada 9 × 7 cm
 Todas las huellas usan paso de 2.54 mm. Por eso la misma ubicación sirve en baquela universal (35 × 27 agujeros). Ocupa 32 × 19 agujeros.
 

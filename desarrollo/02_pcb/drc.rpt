@@ -1,12 +1,82 @@
 ** Drc report for medidor_ppg.kicad_pcb **
-** Created on 2026-11-06T10:36:19 **
-** Report includes: Errors **
+** Created on 2026-11-17T10:36:10 **
+** Report includes: Errors, Warnings **
 
-** Found 0 DRC violations **
+** Found 14 DRC violations **
+[nonmirrored_text_on_back_layer]: Non-Mirrored text on back layer
+    Local override; warning
+    @(130.0000 mm, 146.8000 mm): PCB text 'MEDIDOR PPG v1 - ITM Circuitos II' on B.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(112.4850 mm, 126.3350 mm): Segment of C2 on F.Silkscreen
+    @(113.2000 mm, 126.0000 mm): PCB text 'G' on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(117.7250 mm, 125.2650 mm): Segment of C1 on F.Silkscreen
+    @(115.1050 mm, 125.2050 mm): Reference field of C2
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(118.1350 mm, 129.1450 mm): Reference field of R5
+    @(117.7250 mm, 128.7380 mm): Segment of C2 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(117.7250 mm, 129.0750 mm): Segment of C2 on F.Silkscreen
+    @(118.1350 mm, 129.1450 mm): Reference field of R5
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(115.2550 mm, 131.6150 mm): Footprint text of D2 (A)
+    @(116.8650 mm, 131.5150 mm): Circle of R5 on F.Silkscreen
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(121.3100 mm, 123.8950 mm): Circle of R1 on F.Silkscreen
+    @(122.5800 mm, 125.3350 mm): Reference field of R4
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(112.4850 mm, 129.0750 mm): Segment of C2 on F.Silkscreen
+    @(111.8850 mm, 128.8644 mm): Reference field of D2
+[silk_overlap]: Silkscreen clearance
+    Rule: board setup constraints silk; warning
+    @(138.0050 mm, 127.4550 mm): Circle of D1 on F.Silkscreen
+    @(137.1850 mm, 129.1450 mm): Reference field of R6
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(113.2000 mm, 123.5000 mm): PCB text 'RD' on F.Silkscreen
+    @(112.6050 mm, 123.8950 mm): PTH pad 1 [+3V3] of C1
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(136.7350 mm, 125.1286 mm): Reference field of D1
+    @(136.5500 mm, 123.8950 mm): PTH pad 2 [/INT] of R3
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(111.8850 mm, 128.8644 mm): Reference field of D2
+    @(112.6050 mm, 127.7050 mm): PTH pad 1 [+3V3] of C2
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(100.0000 mm, 100.0000 mm): Rectangle on Edge.Cuts
+    @(103.9987 mm, 99.8500 mm): Reference field of H1
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(100.0000 mm, 100.0000 mm): Rectangle on Edge.Cuts
+    @(161.9987 mm, 99.8500 mm): Reference field of H4
 
 ** Found 0 unconnected pads **
 
-** Found 0 Footprint errors **
+** Found 5 Footprint errors **
+[net_conflict]: Pad missing net given by schematic (unconnected-(J1-Pin_5-Pad5))
+    Local override; warning
+    @(108.5000 mm, 121.1600 mm): PTH pad 5 [<no net>] of J1
+[net_conflict]: Pad missing net given by schematic (unconnected-(J1-Pin_6-Pad6))
+    Local override; warning
+    @(108.5000 mm, 123.7000 mm): PTH pad 6 [<no net>] of J1
+[net_conflict]: Pad missing net given by schematic (unconnected-(J3-Pin_4-Pad4))
+    Local override; warning
+    @(156.8300 mm, 135.6200 mm): PTH pad 4 [<no net>] of J3
+[net_conflict]: Pad missing net given by schematic (unconnected-(J3-Pin_5-Pad5))
+    Local override; warning
+    @(154.2900 mm, 135.6200 mm): PTH pad 5 [<no net>] of J3
+[net_conflict]: Pad missing net given by schematic (unconnected-(J3-Pin_8-Pad8))
+    Local override; warning
+    @(146.6700 mm, 135.6200 mm): PTH pad 8 [<no net>] of J3
 
 ** Ignored checks **
     - Footprint has no courtyard defined

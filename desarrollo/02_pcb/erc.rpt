@@ -1,10 +1,10 @@
-ERC report (2026-11-06T18:05:43, Encoding UTF8)
+ERC report (2026-11-10T17:38:15, Encoding UTF8)
 Report includes: Errors, Warnings
 
 ***** Sheet /
 [lib_symbol_mismatch]: Symbol '2N3904' doesn't match copy in library 'Transistor_BJT'
     ; warning
-    @(166.37 mm, 261.62 mm): Symbol Q1 [2N3904]
+    @(284.48 mm, 254.00 mm): Symbol Q1 [2N3904]
 
  ** ERC messages: 1  Errors 0  Warnings 1
 

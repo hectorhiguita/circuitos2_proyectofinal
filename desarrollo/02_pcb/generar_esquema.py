@@ -158,7 +158,7 @@ def construir():
     hoy = date.today().isoformat()
     partes += ['(kicad_sch\n  (version 20231120)\n  (generator "medidor_ppg_gen")\n  (generator_version "1.0")\n',
                f'  (uuid "{ROOT_UUID}")\n  (paper "A2")\n',
-               f'  (title_block (title "Medidor de ritmo cardiaco PPG - LM324 + ESP32-C3") (date "{hoy}") (rev "1")\n'
+               f'  (title_block (title "Medidor de ritmo cardiaco PPG - MAX30102 + ESP32-C3") (date "{hoy}") (rev "1")\n'
                '    (company "ITM - Circuitos Electricos II") (comment 1 "Conexiones por etiqueta de red. Valores: 01_analogico/ppg.cir"))\n',
                '  (lib_symbols\n', "".join(def_plana(l, n) for l, n in defs), '  )\n']
 
